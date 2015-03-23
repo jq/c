@@ -1,14 +1,24 @@
 package uber.calendar.com.ubercalendar;
 
+import android.location.Location;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class MapsActivity extends FragmentActivity {
+public class MapsActivity extends AbstractMapActivity implements
+        OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,
+        GoogleMap.OnMyLocationChangeListener  {
 
     private GoogleMap mMap; // Might be null if Google Play services APK is not available.
 
@@ -44,22 +54,50 @@ public class MapsActivity extends FragmentActivity {
         // Do a null check to confirm that we have not already instantiated the map.
         if (mMap == null) {
             // Try to obtain the map from the SupportMapFragment.
-            mMap = ((SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map))
-                    .getMap();
-            // Check if we were successful in obtaining the map.
-            if (mMap != null) {
-                setUpMap();
-            }
+            MapFragment mapFrag=
+                    (MapFragment)getFragmentManager().findFragmentById(R.id.map);
+            mapFrag.getMapAsync(this);
         }
     }
+    @Override
+    public void onMapReady(final GoogleMap map) {
+        if (mMap == null) {
+            CameraUpdate center=
+                    CameraUpdateFactory.newLatLng(new LatLng(40.76793169992044,
+                            -73.98180484771729));
+            CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
 
-    /**
-     * This is where we can add markers or lines, add listeners or move the camera. In this case, we
-     * just add a marker near Africa.
-     * <p/>
-     * This should only be called once and when we are sure that {@link #mMap} is not null.
-     */
-    private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+            map.moveCamera(center);
+            map.animateCamera(zoom);
+        }
+
+        //addMarker(map, 40.748963847316034, -73.96807193756104,
+        //        R.string.un, R.string.united_nations);
+        map.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
+        map.setOnInfoWindowClickListener(this);
+
+        map.setMyLocationEnabled(true);
+        map.setOnMyLocationChangeListener(this);
+        mMap = map;
     }
+
+    @Override
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onMyLocationChange(Location lastKnownLocation) {
+        Log.d(getClass().getSimpleName(),
+                String.format("%f:%f", lastKnownLocation.getLatitude(),
+                        lastKnownLocation.getLongitude()));
+    }
+
+    private void addMarker(GoogleMap map, double lat, double lon,
+                           int title, int snippet) {
+        map.addMarker(new MarkerOptions().position(new LatLng(lat, lon))
+                .title(getString(title))
+                .snippet(getString(snippet)));
+    }
+
 }
