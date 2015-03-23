@@ -40,6 +40,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 
+import uber.calendar.com.ubercalendar.util.Util;
+
 public class MapsActivity extends AbstractMapActivity implements
         OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMyLocationChangeListener,GoogleApiClient.OnConnectionFailedListener,
@@ -52,7 +54,7 @@ public class MapsActivity extends AbstractMapActivity implements
     protected GoogleApiClient mGoogleApiClient;
 
     private PlaceAutocompleteAdapter mAdapter;
-
+    private Location lastLocation;
     private AutoCompleteTextView mAutocompleteView;
 
     @Override
@@ -128,6 +130,12 @@ public class MapsActivity extends AbstractMapActivity implements
     @Override
     public void onMyLocationChange(Location lastKnownLocation) {
         if (mMap == null) return;
+        if (lastLocation != null) {
+            if (!Util.locationChanged(lastKnownLocation, lastLocation)) {
+                return;
+            }
+        }
+        lastLocation = lastKnownLocation;
         LatLng latlng=
                 new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
         CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latlng, 15);
