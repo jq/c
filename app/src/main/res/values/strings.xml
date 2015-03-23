@@ -3,5 +3,7 @@
     <string name="title_activity_maps">Map</string>
     <string name="setting">Setting</string>
     <string name="no_maps">Google Maps V2 not available!</string>
+    <string name="autocomplete_hint">Enter place name or address</string>
+    <string name="place_details">&lt;b&gt;%1$s&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Place Id: %2$s&lt;/i&gt;&lt;br/&gt;Address: %3$s&lt;br/&gt;Phone: %4$s&lt;br/&gt;Website: %5$s</string>
 
 </resources>
