@@ -61,16 +61,6 @@ public class MapsActivity extends AbstractMapActivity implements
     }
     @Override
     public void onMapReady(final GoogleMap map) {
-        if (mMap == null) {
-            CameraUpdate center=
-                    CameraUpdateFactory.newLatLng(new LatLng(40.76793169992044,
-                            -73.98180484771729));
-            CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
-
-            map.moveCamera(center);
-            map.animateCamera(zoom);
-        }
-
         //addMarker(map, 40.748963847316034, -73.96807193756104,
         //        R.string.un, R.string.united_nations);
         map.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
@@ -88,6 +78,13 @@ public class MapsActivity extends AbstractMapActivity implements
 
     @Override
     public void onMyLocationChange(Location lastKnownLocation) {
+        if (mMap == null) return;
+        LatLng latlng=
+                new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+        CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latlng, 15);
+
+        mMap.animateCamera(cu);
+
         Log.d(getClass().getSimpleName(),
                 String.format("%f:%f", lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude()));
