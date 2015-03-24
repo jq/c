@@ -12,7 +12,7 @@
     http://commonsware.com/Android
  */
 
-package uber.calendar.com.ubercalendar;
+package com.ubercalendar;
 
 import android.annotation.SuppressLint;
 import android.view.LayoutInflater;

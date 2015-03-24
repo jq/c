@@ -1,4 +1,4 @@
-package uber.calendar.com.ubercalendar;
+package com.ubercalendar;
 
 import android.content.res.Resources;
 import android.location.Address;
@@ -40,7 +40,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 
-import uber.calendar.com.ubercalendar.util.Util;
+import com.ubercalendar.util.Util;
 
 public class MapsActivity extends AbstractMapActivity implements
         OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,

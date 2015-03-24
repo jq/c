@@ -16,7 +16,7 @@
 
 
 
-package uber.calendar.com.ubercalendar.logger;
+package com.ubercalendar.logger;
 
 import android.graphics.Typeface;
 import android.os.Bundle;

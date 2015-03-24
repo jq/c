@@ -14,7 +14,7 @@
  *  limitations under the License.
  */
 
-package uber.calendar.com.ubercalendar;
+package com.ubercalendar;
 
 import android.content.Context;
 import android.widget.ArrayAdapter;
@@ -35,11 +35,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
-import uber.calendar.com.ubercalendar.logger.Log;
+import com.ubercalendar.logger.Log;
 
 /**
  * Adapter that handles Autocomplete requests from the Places Geo Data API.
- * Results are encoded as {@link uber.calendar.com.ubercalendar.PlaceAutocompleteAdapter.PlaceAutocomplete}
+ * Results are encoded as {@link com.ubercalendar.PlaceAutocompleteAdapter.PlaceAutocomplete}
  * objects
  * that contain both the Place ID and the text description from the autocomplete query.
  * <p>
@@ -165,7 +165,7 @@ public class PlaceAutocompleteAdapter
 
     /**
      * Submits an autocomplete query to the Places Geo Data Autocomplete API.
-     * Results are returned as {@link uber.calendar.com.ubercalendar.PlaceAutocompleteAdapter.PlaceAutocomplete}
+     * Results are returned as {@link com.ubercalendar.PlaceAutocompleteAdapter.PlaceAutocomplete}
      * objects to store the Place ID and description that the API returns.
      * Returns an empty list if no results were found.
      * Returns null if the API client is not available or the query did not complete

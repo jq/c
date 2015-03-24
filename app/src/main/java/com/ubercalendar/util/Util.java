@@ -1,4 +1,4 @@
-package uber.calendar.com.ubercalendar.util;
+package com.ubercalendar.util;
 
 import android.location.Location;
 

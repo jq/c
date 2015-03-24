@@ -1,4 +1,4 @@
-package uber.calendar.com.ubercalendar;
+package com.ubercalendar;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

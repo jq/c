@@ -13,7 +13,7 @@
  *  See the License for the specific language governing permissions and
  *  limitations under the License.
  */
-package uber.calendar.com.ubercalendar.logger;
+package com.ubercalendar.logger;
 
 /**
  * Simple {@link LogNode} filter, removes everything except the message.
