@@ -26,6 +26,8 @@ import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -130,6 +132,22 @@ public class AbstractMapActivity extends FragmentActivity {
     }
     return 1;
   }
+    public static void setIME(final View v, final Activity activity) {
+        v.requestFocus();
+        v.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.showSoftInput(v, InputMethodManager.SHOW_FORCED);
+            }
+        }, 100);
+    }
+
+    public static void hideIME(final View v, final Activity activity) {
+        InputMethodManager imm = (InputMethodManager)activity.getSystemService(
+                Context.INPUT_METHOD_SERVICE);
+        imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    }
 
   /** @see android.content.pm.FeatureInfo#getGlEsVersion() */
   private static int getMajorVersion(int glEsVersion) {

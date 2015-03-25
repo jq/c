@@ -191,7 +191,7 @@ public class PlaceAutocompleteAdapter
             // This method should have been called off the main UI thread. Block and wait for at most 60s
             // for a result from the API.
             AutocompletePredictionBuffer autocompletePredictions = results
-                    .await(60, TimeUnit.SECONDS);
+                    .await(5, TimeUnit.SECONDS);
 
             // Confirm that the query completed successfully, otherwise return null
             final Status status = autocompletePredictions.getStatus();

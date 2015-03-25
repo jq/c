@@ -138,15 +138,19 @@ public class MapsActivity extends AbstractMapActivity implements
         lastLocation = lastKnownLocation;
         LatLng latlng=
                 new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-        CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latlng, 15);
-
-        mMap.animateCamera(cu);
+        move(latlng);
 /*        LatLngBounds curScreen = mMap.getProjection()
                 .getVisibleRegion().latLngBounds;
         mAdapter.setBounds(curScreen);*/
         Log.d(getClass().getSimpleName(),
                 String.format("%f:%f", lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude()));
+    }
+    protected void move(LatLng latlng) {
+        CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latlng, 15);
+
+        mMap.animateCamera(cu);
+
     }
 
     private void addMarker(GoogleMap map, double lat, double lon,
@@ -227,9 +231,9 @@ public class MapsActivity extends AbstractMapActivity implements
             PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
                     .getPlaceById(mGoogleApiClient, placeId);
             placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
-
-            Toast.makeText(getApplicationContext(), "Clicked: " + item.description,
-                    Toast.LENGTH_SHORT).show();
+            mAutocompleteView.clearListSelection();
+            mAutocompleteView.setText("");
+            hideIME(mAutocompleteView, MapsActivity.this);
             Log.i(TAG, "Called getPlaceById to get Place details for " + item.placeId);
         }
     };
@@ -250,7 +254,7 @@ public class MapsActivity extends AbstractMapActivity implements
             }
             // Get the Place object from the buffer.
             final Place place = places.get(0);
-
+            move(place.getLatLng());
             Log.i(TAG, "Place details received: " + place.getName());
         }
     };
