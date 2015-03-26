@@ -18,12 +18,24 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:id="@+id/map" tools:context=".MapsActivity"
         class="com.ubercalendar.util.BaseMapFragment">
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            >
     <ImageView
         android:id="@+id/img_pickup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:src="@drawable/ub__pin_pickup"
-        android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_alignBottom="@+id/view1"
         />
+        <View
+            android:id="@+id/view1"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
+        </RelativeLayout>
     </fragment>
 </LinearLayout>

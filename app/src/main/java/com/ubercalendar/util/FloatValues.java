@@ -2,6 +2,7 @@ package com.ubercalendar.util;
 
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.util.Log;
 
 /**
  * Created by julian on 3/26/15.
@@ -37,8 +38,10 @@ public enum FloatValues {
         return false;
     }
     public static boolean updateLocation(Location location) {
-        if ((Math.abs(location.getLatitude() - LAST_LAT.get()) < 0.0003) &&
-            (Math.abs(location.getLongitude() - LAST_LNG.get()) < 0.0003)) return false;
+        if ((Math.abs(location.getLatitude() - LAST_LAT.get()) < 0.0008) &&
+            (Math.abs(location.getLongitude() - LAST_LNG.get()) < 0.0008)) return false;
+        Ln.e(String.format("%f:%f", location.getLatitude(),
+                        location.getLongitude()));
         LAST_LAT.set((float)location.getLatitude());
         LAST_LNG.set((float)location.getLongitude());
         return true;

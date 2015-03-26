@@ -153,9 +153,6 @@ public class MapsActivity extends AbstractMapActivity implements
 /*        LatLngBounds curScreen = mMap.getProjection()
                 .getVisibleRegion().latLngBounds;
         mAdapter.setBounds(curScreen); R.drawable.ub__pin_pickup*/
-        Log.d(getClass().getSimpleName(),
-                String.format("%f:%f", lastKnownLocation.getLatitude(),
-                        lastKnownLocation.getLongitude()));
     }
     protected void move(double lat, double lng) {
         LatLng latlng=
