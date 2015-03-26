@@ -1,5 +1,7 @@
 package com.ubercalendar;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
@@ -42,6 +44,8 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 
+import com.ubercalendar.util.FloatValues;
+import com.ubercalendar.util.Ln;
 import com.ubercalendar.util.Util;
 
 import hugo.weaving.DebugLog;
@@ -58,12 +62,13 @@ public class MapsActivity extends AbstractMapActivity implements
     protected GoogleApiClient mGoogleApiClient;
 
     private PlaceAutocompleteAdapter mAdapter;
-    private Location lastLocation;
     private AutoCompleteTextView mAutocompleteView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        SharedPreferences pref = getSharedPreferences("pref", Context.MODE_PRIVATE);
+        FloatValues.init(pref);
         if (mGoogleApiClient == null) {
             rebuildGoogleApiClient();
         }
@@ -113,6 +118,7 @@ public class MapsActivity extends AbstractMapActivity implements
                     (MapFragment)getFragmentManager().findFragmentById(R.id.map);
             mMap = mapFrag.getMap();
             if (mMap != null) {
+                Ln.e("has map in resume");
                 setupMap(mMap);
             } else {
                 mapFrag.getMapAsync(this);
@@ -120,18 +126,19 @@ public class MapsActivity extends AbstractMapActivity implements
         }
     }
     private void setupMap(final GoogleMap map) {
-        //addMarker(map, 40.748963847316034, -73.96807193756104,
-        //        R.string.un, R.string.united_nations);
+        if (FloatValues.LAST_LAT.get() != 0) {
+            move(FloatValues.LAST_LAT.get(), FloatValues.LAST_LNG.get());
+        }
         map.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
         map.setOnInfoWindowClickListener(this);
-
         map.setMyLocationEnabled(true);
         map.setOnMyLocationChangeListener(this);
     }
-    @Override @DebugLog
+    @Override
     public void onMapReady(final GoogleMap map) {
         mMap = map;
         setupMap(map);
+        move(map.getMyLocation());
     }
 
     @Override
@@ -139,18 +146,10 @@ public class MapsActivity extends AbstractMapActivity implements
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
     }
 
-    @Override @DebugLog
+    @Override
     public void onMyLocationChange(Location lastKnownLocation) {
         if (mMap == null) return;
-        if (lastLocation != null) {
-            if (!Util.locationChanged(lastKnownLocation, lastLocation)) {
-                return;
-            }
-        }
-        lastLocation = lastKnownLocation;
-        LatLng latlng=
-                new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-        move(latlng);
+        move(lastKnownLocation);
 /*        LatLngBounds curScreen = mMap.getProjection()
                 .getVisibleRegion().latLngBounds;
         mAdapter.setBounds(curScreen); R.drawable.ub__pin_pickup*/
@@ -158,11 +157,23 @@ public class MapsActivity extends AbstractMapActivity implements
                 String.format("%f:%f", lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude()));
     }
-    protected void move(LatLng latlng) {
-        CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latlng, 15);
+    protected void move(double lat, double lng) {
+        LatLng latlng=
+                new LatLng(lat, lng);
+        move(latlng);
+    }
+    protected void move(LatLng latLng) {
+        CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latLng, 15);
         mMap.moveCamera(cu);
         //mMap.animateCamera(cu);
-
+    }
+    protected void move(Location location) {
+        if (location == null) return;
+        if (FloatValues.updateLocation(location)) {
+            LatLng latlng =
+                    new LatLng(location.getLatitude(), location.getLongitude());
+            move(latlng);
+        }
     }
     public void onUpdateMapAfterUserInteraction() {
         LatLng latLng = mMap.getProjection()
