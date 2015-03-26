@@ -44,6 +44,8 @@ import java.util.List;
 
 import com.ubercalendar.util.Util;
 
+import hugo.weaving.DebugLog;
+
 public class MapsActivity extends AbstractMapActivity implements
         OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMyLocationChangeListener,GoogleApiClient.OnConnectionFailedListener,
@@ -109,11 +111,15 @@ public class MapsActivity extends AbstractMapActivity implements
             // Try to obtain the map from the SupportMapFragment.
             MapFragment mapFrag=
                     (MapFragment)getFragmentManager().findFragmentById(R.id.map);
-            mapFrag.getMapAsync(this);
+            mMap = mapFrag.getMap();
+            if (mMap != null) {
+                setupMap(mMap);
+            } else {
+                mapFrag.getMapAsync(this);
+            }
         }
     }
-    @Override
-    public void onMapReady(final GoogleMap map) {
+    private void setupMap(final GoogleMap map) {
         //addMarker(map, 40.748963847316034, -73.96807193756104,
         //        R.string.un, R.string.united_nations);
         map.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
@@ -121,7 +127,11 @@ public class MapsActivity extends AbstractMapActivity implements
 
         map.setMyLocationEnabled(true);
         map.setOnMyLocationChangeListener(this);
+    }
+    @Override @DebugLog
+    public void onMapReady(final GoogleMap map) {
         mMap = map;
+        setupMap(map);
     }
 
     @Override
@@ -129,7 +139,7 @@ public class MapsActivity extends AbstractMapActivity implements
         Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
     }
 
-    @Override
+    @Override @DebugLog
     public void onMyLocationChange(Location lastKnownLocation) {
         if (mMap == null) return;
         if (lastLocation != null) {
@@ -150,8 +160,8 @@ public class MapsActivity extends AbstractMapActivity implements
     }
     protected void move(LatLng latlng) {
         CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latlng, 15);
-
-        mMap.animateCamera(cu);
+        mMap.moveCamera(cu);
+        //mMap.animateCamera(cu);
 
     }
     public void onUpdateMapAfterUserInteraction() {
