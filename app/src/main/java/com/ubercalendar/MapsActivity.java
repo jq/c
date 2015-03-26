@@ -47,7 +47,6 @@ import com.ubercalendar.util.Util;
 public class MapsActivity extends AbstractMapActivity implements
         OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,
         GoogleMap.OnMyLocationChangeListener,GoogleApiClient.OnConnectionFailedListener,
-        GoogleMap.OnMarkerDragListener,
         GoogleApiClient.ConnectionCallbacks   {
     public static final String TAG = "MapsActivity";
     private static final LatLngBounds BOUNDS_GREATER_SYDNEY = new LatLngBounds(
@@ -122,7 +121,6 @@ public class MapsActivity extends AbstractMapActivity implements
 
         map.setMyLocationEnabled(true);
         map.setOnMyLocationChangeListener(this);
-        map.setOnMarkerDragListener(this);
         mMap = map;
     }
 
@@ -145,8 +143,7 @@ public class MapsActivity extends AbstractMapActivity implements
         move(latlng);
 /*        LatLngBounds curScreen = mMap.getProjection()
                 .getVisibleRegion().latLngBounds;
-        mAdapter.setBounds(curScreen);*/
-        addMarker(mMap, latlng.latitude, latlng.longitude, R.drawable.ub__pin_pickup);
+        mAdapter.setBounds(curScreen); R.drawable.ub__pin_pickup*/
         Log.d(getClass().getSimpleName(),
                 String.format("%f:%f", lastKnownLocation.getLatitude(),
                         lastKnownLocation.getLongitude()));
@@ -157,37 +154,18 @@ public class MapsActivity extends AbstractMapActivity implements
         mMap.animateCamera(cu);
 
     }
+    public void onUpdateMapAfterUserInteraction() {
+        LatLng latLng = mMap.getProjection()
+                .getVisibleRegion().latLngBounds.getCenter();
+        Log.d(getClass().getSimpleName(),
+                String.format("%f:%f", latLng.latitude, latLng.longitude));
+
+    }
 
     private void addMarker(GoogleMap map, double lat, double lon, int iconRes) {
         BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(iconRes);
         map.addMarker(new MarkerOptions().position(new LatLng(lat, lon))
-                .draggable(true).icon(icon));
-    }
-    @Override
-    public void onMarkerDragStart(Marker marker) {
-        LatLng position=marker.getPosition();
-
-        Log.d(getClass().getSimpleName(), String.format("Drag from %f:%f",
-                position.latitude,
-                position.longitude));
-    }
-
-    @Override
-    public void onMarkerDrag(Marker marker) {
-        LatLng position=marker.getPosition();
-
-        Log.d(getClass().getSimpleName(),
-                String.format("Dragging to %f:%f", position.latitude,
-                        position.longitude));
-    }
-
-    @Override
-    public void onMarkerDragEnd(Marker marker) {
-        LatLng position=marker.getPosition();
-
-        Log.d(getClass().getSimpleName(), String.format("Dragged to %f:%f",
-                position.latitude,
-                position.longitude));
+                .draggable(true).icon(icon).flat(true));
     }
 
     private class GeocoderTask extends AsyncTask<String, Void, List<Address>> {
