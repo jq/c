@@ -22,20 +22,28 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
-    <ImageView
-        android:id="@+id/img_pickup"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/ub__pin_pickup"
-        android:layout_centerHorizontal="true"
-        android:layout_alignBottom="@+id/view1"
-        />
-        <View
-            android:id="@+id/view1"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
+            <Button android:id="@+id/button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_above="@+id/img_pickup"
+                android:background="@drawable/ub__button_request_bg"
+                android:textColor="@android:color/white"
+                android:text="@string/pickup" />
+            <ImageView
+            android:id="@+id/img_pickup"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/ub__pin_pickup"
             android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true" />
+            android:layout_alignBottom="@+id/view1"
+            />
+            <View
+                android:id="@+id/view1"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_centerHorizontal="true"
+                android:layout_centerVertical="true" />
         </RelativeLayout>
     </fragment>
 </LinearLayout>
