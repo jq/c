@@ -15,8 +15,12 @@
 
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:id="@+id/map" tools:context=".MapsActivity"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:id="@+id/map"
+        tools:context=".MapsActivity"
         class="com.ubercalendar.util.BaseMapFragment">
         <RelativeLayout
             android:layout_width="match_parent"
@@ -46,4 +50,34 @@
                 android:layout_centerVertical="true" />
         </RelativeLayout>
     </fragment>
+    <RadioGroup xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <RadioButton android:id="@+id/radio_pool"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uber_pool"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_uberx"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uberx"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_uberxl"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uberxl"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_black"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/uber_black"
+            android:onClick="onRadioButtonClicked"/>
+        <RadioButton android:id="@+id/radio_taxi"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/taxi"
+            android:onClick="onRadioButtonClicked"/>
+    </RadioGroup>
 </LinearLayout>

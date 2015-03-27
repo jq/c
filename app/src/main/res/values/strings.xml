@@ -6,4 +6,10 @@
     <string name="autocomplete_hint">Enter place name or address</string>
     <string name="place_details">&lt;b&gt;%1$s&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Place Id: %2$s&lt;/i&gt;&lt;br/&gt;Address: %3$s&lt;br/&gt;Phone: %4$s&lt;br/&gt;Website: %5$s</string>
     <string name="pickup">PICKUP</string>
+    <string name="uberx">uberX</string>
+    <string name="uber_black">Black</string>
+    <string name="uberxl">uberXL</string>
+    <string name="uber_pool">Pool</string>
+    <string name="taxi">TAXI</string>
+
 </resources>
