@@ -8,15 +8,13 @@ import android.view.MenuItem;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
-import com.rahul.uberapi.android.demo.api.UberAPIClient;
-import com.rahul.uberapi.android.demo.api.UberCallback;
-import com.rahul.uberapi.android.demo.model.PriceEstimateList;
-import com.rahul.uberapi.android.demo.model.ProductList;
-import com.rahul.uberapi.android.demo.model.Profile;
-import com.rahul.uberapi.android.demo.model.TimeEstimateList;
-import com.rahul.uberapi.android.demo.model.UserActivity;
-import com.ubercalendar.Constants;
-import com.ubercalendar.R;
+import com.ubercalendar.api.UberAPIClient;
+import com.ubercalendar.api.UberCallback;
+import com.ubercalendar.model.PriceEstimateList;
+import com.ubercalendar.model.ProductList;
+import com.ubercalendar.model.Profile;
+import com.ubercalendar.model.TimeEstimateList;
+import com.ubercalendar.model.UserActivity;
 
 import java.util.ArrayList;
 import java.util.List;

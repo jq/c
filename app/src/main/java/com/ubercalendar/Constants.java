@@ -26,15 +26,15 @@ public class Constants {
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static String getUberClientId(Activity activity) {
-        return getManifestData(activity, "com.rahul.uberapi.android.demo.UBER_CLIENT_ID");
+        return getManifestData(activity, "com.ubercalendar.UBER_CLIENT_ID");
     }
 
     public static String getUberClientSecret(Activity activity) {
-        return getManifestData(activity, "com.rahul.uberapi.android.demo.UBER_CLIENT_SECRET");
+        return getManifestData(activity, "com.ubercalendar.UBER_CLIENT_SECRET");
     }
 
     public static String getUberRedirectUrl(Activity activity) {
-        return getManifestData(activity, "com.rahul.uberapi.android.demo.UBER_REDIRECT_URL");
+        return getManifestData(activity, "com.ubercalendar.UBER_REDIRECT_URL");
     }
 
     public static String getManifestData(Activity activity, String name) {

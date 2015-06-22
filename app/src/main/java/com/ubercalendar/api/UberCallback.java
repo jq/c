@@ -1,4 +1,4 @@
-package com.rahul.uberapi.android.demo.api;
+package com.ubercalendar.api;
 
 import retrofit.Callback;
 import retrofit.RetrofitError;

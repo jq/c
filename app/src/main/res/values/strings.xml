@@ -5,5 +5,13 @@
     <string name="no_maps">Google Maps V2 not available!</string>
     <string name="autocomplete_hint">Enter place name or address</string>
     <string name="place_details">&lt;b&gt;%1$s&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Place Id: %2$s&lt;/i&gt;&lt;br/&gt;Address: %3$s&lt;br/&gt;Phone: %4$s&lt;br/&gt;Website: %5$s</string>
-
+    <string name="demo_list_header_text">\nCongratulations! you have successfully authenticated and your token is: %s\n\nTest the following functions of the api!\n</string>
+    <string name="products">Products!</string>
+    <string name="time_estimates">Time Estimates!</string>
+    <string name="price_estimates">Price Estimates!</string>
+    <string name="history_v1">History! (v1)</string>
+    <string name="history_v1_1">History! (v1.1)</string>
+    <string name="me">Me!</string>
+    <string name="endpoint_list_header_text">Welcome to the %s endpoint!</string>
+    <string name="endpoint_list_result_text">Here is the result of a call to %s:</string>
 </resources>

@@ -9,11 +9,9 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Toast;
 
-import com.rahul.uberapi.android.demo.api.UberAuthTokenClient;
-import com.rahul.uberapi.android.demo.api.UberCallback;
-import com.rahul.uberapi.android.demo.model.User;
-import com.ubercalendar.Constants;
-import com.ubercalendar.R;
+import com.ubercalendar.api.UberAuthTokenClient;
+import com.ubercalendar.api.UberCallback;
+import com.ubercalendar.model.User;
 
 import retrofit.client.Response;
 

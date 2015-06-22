@@ -1,12 +1,12 @@
-package com.rahul.uberapi.android.demo.api;
+package com.ubercalendar.api;
 
-import com.rahul.uberapi.android.demo.BuildConfig;
-import com.rahul.uberapi.android.demo.Constants;
-import com.rahul.uberapi.android.demo.model.PriceEstimateList;
-import com.rahul.uberapi.android.demo.model.ProductList;
-import com.rahul.uberapi.android.demo.model.Profile;
-import com.rahul.uberapi.android.demo.model.TimeEstimateList;
-import com.rahul.uberapi.android.demo.model.UserActivity;
+import com.ubercalendar.BuildConfig;
+import com.ubercalendar.Constants;
+import com.ubercalendar.model.PriceEstimateList;
+import com.ubercalendar.model.ProductList;
+import com.ubercalendar.model.Profile;
+import com.ubercalendar.model.TimeEstimateList;
+import com.ubercalendar.model.UserActivity;
 
 import retrofit.Callback;
 import retrofit.Endpoint;

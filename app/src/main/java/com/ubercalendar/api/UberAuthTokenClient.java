@@ -1,8 +1,8 @@
-package com.rahul.uberapi.android.demo.api;
+package com.ubercalendar.api;
 
-import com.rahul.uberapi.android.demo.BuildConfig;
-import com.rahul.uberapi.android.demo.Constants;
-import com.rahul.uberapi.android.demo.model.User;
+import com.ubercalendar.BuildConfig;
+import com.ubercalendar.Constants;
+import com.ubercalendar.model.User;
 
 import retrofit.Callback;
 import retrofit.RestAdapter;
