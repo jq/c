@@ -19,6 +19,12 @@ public class Constants {
     public static final String SCOPES = "profile history_lite history";
     public static final String BASE_UBER_URL_V1 = "https://api.uber.com/v1/";
     public static final String BASE_UBER_URL_V1_1 = "https://api.uber.com/v1.1/";
+    public static final String ACCESS_TOKEN = "access_token";
+    public static final String TOKEN_TYPE = "token_type";
+    public static final String START_LAT = "start_lat";
+    public static final String START_LON = "start_lon";
+    public static final String END_LAT = "end_lat";
+    public static final String END_LON = "end_lon";
     public static final double START_LATITUDE = 37.781955;
     public static final double START_LONGITUDE = -122.402367;
     public static final double END_LATITUDE = 37.744352;
@@ -43,7 +49,8 @@ public class Constants {
             return data;
         }
         try {
-            ApplicationInfo ai = activity.getPackageManager().getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
+            ApplicationInfo ai = activity.getPackageManager()
+                .getApplicationInfo(activity.getPackageName(), PackageManager.GET_META_DATA);
             Bundle bundle = ai.metaData;
             data = bundle.getString(name);
             authParameters.put(name, data);
@@ -52,5 +59,4 @@ public class Constants {
         }
         return data;
     }
-
 }
