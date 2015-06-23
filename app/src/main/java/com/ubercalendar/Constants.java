@@ -25,10 +25,6 @@ public class Constants {
     public static final String START_LON = "start_lon";
     public static final String END_LAT = "end_lat";
     public static final String END_LON = "end_lon";
-    public static final double START_LATITUDE = 37.781955;
-    public static final double START_LONGITUDE = -122.402367;
-    public static final double END_LATITUDE = 37.744352;
-    public static final double END_LONGITUDE = -122.416743;
     public static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
 
     public static String getUberClientId(Activity activity) {

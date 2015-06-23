@@ -260,6 +260,12 @@ public class MapsActivity extends AbstractMapActivity implements
       // Get the Place object from the buffer.
       final Place place = places.get(0);
       final LatLng latLng = place.getLatLng();
+      Log.i(TAG, String.format(
+          "startLatitude: %s, startLongitude: %s, endLatitude: %s, endLongitude %s",
+          lastLocation.getLatitude(),
+          lastLocation.getLongitude(),
+          latLng.latitude,
+          latLng.longitude));
       DemoActivity.start(MapsActivity.this,
           getIntent().getStringExtra(Constants.ACCESS_TOKEN),
           getIntent().getStringExtra(Constants.TOKEN_TYPE),

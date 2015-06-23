@@ -55,8 +55,8 @@ public class EndpointActivity extends ActionBarActivity {
     switch (position) {
       case 1:
         UberAPIClient.getUberV1APIClient().getProducts(getAccessToken(),
-            Constants.START_LATITUDE,
-            Constants.START_LONGITUDE,
+            startLat,
+            startLon,
             new UberCallback<ProductList>() {
               @Override
               public void success(ProductList productList, Response response) {
