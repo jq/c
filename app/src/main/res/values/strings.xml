@@ -1,6 +1,7 @@
 <resources>
     <string name="app_name">Uber Calendar</string>
     <string name="title_activity_maps">Map</string>
+    <string name="title_fare_estimate">Fare Estimate</string>
     <string name="setting">Setting</string>
     <string name="no_maps">Google Maps V2 not available!</string>
     <string name="autocomplete_hint">Enter place name or address</string>
@@ -14,4 +15,6 @@
     <string name="me">Me!</string>
     <string name="endpoint_list_header_text">Welcome to the %s endpoint!</string>
     <string name="endpoint_list_result_text">Here is the result of a call to %s:</string>
+    <string name="fare_estimate_title">FARE ESTIMATE</string>
+    <string name="uber_x">UBERX</string>
 </resources>

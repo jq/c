@@ -237,7 +237,7 @@ public class MapsActivity extends AbstractMapActivity implements
           .getPlaceById(mGoogleApiClient, placeId);
       placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
       mAutocompleteView.clearListSelection();
-      mAutocompleteView.setText("");
+//      mAutocompleteView.setText("");
       hideIME(mAutocompleteView, MapsActivity.this);
       Log.i(TAG, "Called getPlaceById to get Place details for " + item.placeId);
     }
@@ -266,7 +266,7 @@ public class MapsActivity extends AbstractMapActivity implements
           lastLocation.getLongitude(),
           latLng.latitude,
           latLng.longitude));
-      DemoActivity.start(MapsActivity.this,
+      FareEstimateActivity.start(MapsActivity.this,
           getIntent().getStringExtra(Constants.ACCESS_TOKEN),
           getIntent().getStringExtra(Constants.TOKEN_TYPE),
           lastLocation.getLatitude(),
