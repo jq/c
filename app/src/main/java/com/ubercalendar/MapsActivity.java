@@ -13,8 +13,10 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -76,12 +78,22 @@ public class MapsActivity extends AbstractMapActivity implements
     // Register a listener that receives callbacks when a suggestion has been selected
     mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
 
-
     // Set up the adapter that will retrieve suggestions from the Places Geo Data API that cover
     // the entire world.
     mAdapter = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
         BOUNDS_GREATER_SYDNEY, null);
     mAutocompleteView.setAdapter(mAdapter);
+
+    Button clearAddress = (Button) findViewById(R.id.clear_address);
+    clearAddress.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        mAutocompleteView.setText("");
+        mAutocompleteView.requestFocus();
+        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+        imm.showSoftInput(mAutocompleteView, InputMethodManager.SHOW_IMPLICIT);
+      }
+    });
     setUpMapIfNeeded();
   }
 
@@ -89,6 +101,7 @@ public class MapsActivity extends AbstractMapActivity implements
   protected void onResume() {
     super.onResume();
     setUpMapIfNeeded();
+    mAutocompleteView.selectAll();
   }
 
   /**
@@ -115,6 +128,7 @@ public class MapsActivity extends AbstractMapActivity implements
       mapFrag.getMapAsync(this);
     }
   }
+
   @Override
   public void onMapReady(final GoogleMap map) {
     //addMarker(map, 40.748963847316034, -73.96807193756104,

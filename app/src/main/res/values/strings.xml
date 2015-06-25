@@ -4,7 +4,7 @@
     <string name="title_fare_estimate">Fare Estimate</string>
     <string name="setting">Setting</string>
     <string name="no_maps">Google Maps V2 not available!</string>
-    <string name="autocomplete_hint">Enter place name or address</string>
+    <string name="autocomplete_hint">Enter address</string>
     <string name="place_details">&lt;b&gt;%1$s&lt;/b&gt;&lt;br/&gt;&lt;i&gt;Place Id: %2$s&lt;/i&gt;&lt;br/&gt;Address: %3$s&lt;br/&gt;Phone: %4$s&lt;br/&gt;Website: %5$s</string>
     <string name="demo_list_header_text">\nCongratulations! you have successfully authenticated and your token is: %s\n\nTest the following functions of the api!\n</string>
     <string name="products">Products!</string>

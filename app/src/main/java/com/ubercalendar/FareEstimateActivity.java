@@ -3,10 +3,7 @@ package com.ubercalendar;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.ActionBarActivity;
-import android.util.AttributeSet;
-import android.view.View;
 import android.widget.ListView;
 
 import com.ubercalendar.api.UberAPIClient;
