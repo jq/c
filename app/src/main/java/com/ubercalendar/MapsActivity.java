@@ -86,6 +86,7 @@ public class MapsActivity extends AbstractMapActivity implements
     clearStartLocationButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
+        startLocationTextView.setText("");
         startLocationTextView.setHint(R.string.current_location);
         startLatLng = null;
       }
@@ -115,6 +116,7 @@ public class MapsActivity extends AbstractMapActivity implements
     startLatLng = null;
     clearStartLocationButton.setVisibility(View.GONE);
     loadCurrentPlace(null);
+    startLocationTextView.setText("");
     startLocationTextView.setHint(R.string.current_location);
 
     endLocationTextView.selectAll();
@@ -125,6 +127,7 @@ public class MapsActivity extends AbstractMapActivity implements
   protected void onPause() {
     hideIME(startLocationTextView, this);
     hideIME(endLocationTextView, this);
+    super.onPause();
   }
 
   private void loadCurrentPlace(final ResultCallback<PlaceLikelihoodBuffer> callback) {
