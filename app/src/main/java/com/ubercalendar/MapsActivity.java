@@ -12,10 +12,13 @@ import android.os.Bundle;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -57,6 +60,7 @@ public class MapsActivity extends AbstractMapActivity implements
   private AutoCompleteTextView endLocationTextView;
   private PlaceLikelihoodBuffer currentLikelyPlaceBuffer;
   private LatLng startLatLng = null;
+  private LatLng endLatLng = null;
   private Button clearStartLocationButton;
 
   private Location lastLocation;
@@ -105,6 +109,25 @@ public class MapsActivity extends AbstractMapActivity implements
       public void onClick(View view) {
         endLocationTextView.setText("");
       }
+    });
+    endLocationTextView.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+      @Override
+      public boolean onEditorAction(TextView arg0, int arg1, KeyEvent arg2) {
+        if (arg1 == EditorInfo.IME_ACTION_GO) {
+          if (endLatLng == null) {
+            Toast.makeText(MapsActivity.this, "Must set destination", Toast.LENGTH_LONG).show();
+            return false;
+          }
+
+          if (startLatLng != null) {
+            estimateFare(startLatLng, endLatLng);
+          } else {
+            estimateFareFromCurrentPlace(endLatLng);
+          }
+        }
+        return false;
+      }
+
     });
     loadCurrentPlace(null);
   }
@@ -333,11 +356,11 @@ public class MapsActivity extends AbstractMapActivity implements
       }
       // Get the Place object from the buffer.
       final Place place = places.get(0);
-      final LatLng latLng = place.getLatLng();
+      endLatLng = place.getLatLng();
       if (startLatLng != null) {
-        estimateFare(startLatLng, latLng);
+        estimateFare(startLatLng, endLatLng);
       } else {
-        estimateFareFromCurrentPlace(latLng);
+        estimateFareFromCurrentPlace(endLatLng);
       }
     }
   };
