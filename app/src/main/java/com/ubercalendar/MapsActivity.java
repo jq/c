@@ -32,6 +32,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
@@ -48,8 +49,9 @@ public class MapsActivity extends AbstractMapActivity implements
     GoogleMap.OnMyLocationChangeListener,GoogleApiClient.OnConnectionFailedListener,
     GoogleApiClient.ConnectionCallbacks   {
   public static final String TAG = "MapsActivity";
-  private static final LatLngBounds BOUNDS_GREATER_SYDNEY = new LatLngBounds(
-      new LatLng(-34.041458, 150.790100), new LatLng(-33.682247, 151.383362));
+  // TODO replace with SF bounds
+  private static final LatLngBounds SF = new LatLngBounds(
+      new LatLng(37.768099, -122.418755), new LatLng(37.78416, -122.398906));
 
   private GoogleMap mMap; // Might be null if Google Play services APK is not available.
   protected GoogleApiClient mGoogleApiClient;
@@ -82,7 +84,7 @@ public class MapsActivity extends AbstractMapActivity implements
 
     startLocationTextView = (AutoCompleteTextView) findViewById(R.id.start_location);
     startLocationAdatper = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
-        BOUNDS_GREATER_SYDNEY, null);
+            SF, null);
     startLocationTextView.setAdapter(startLocationAdatper);
     startLocationTextView.setOnItemClickListener(startLocationSelectedListener);
 
@@ -98,7 +100,7 @@ public class MapsActivity extends AbstractMapActivity implements
 
     endLocationTextView = (AutoCompleteTextView) findViewById(R.id.end_location);
     endLocationAdatper = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
-        BOUNDS_GREATER_SYDNEY, null);
+            SF, null);
     endLocationTextView.setAdapter(endLocationAdatper);
     // Register a listener that receives callbacks when a suggestion has been selected
     endLocationTextView.setOnItemClickListener(endLocationSelectedListener);
@@ -129,13 +131,14 @@ public class MapsActivity extends AbstractMapActivity implements
       }
 
     });
+    setUpMapIfNeeded();
     loadCurrentPlace(null);
   }
 
   @Override
   protected void onResume() {
     super.onResume();
-
+    setUpMapIfNeeded();
     startLatLng = null;
     clearStartLocationButton.setVisibility(View.GONE);
     loadCurrentPlace(null);
@@ -152,7 +155,30 @@ public class MapsActivity extends AbstractMapActivity implements
     hideIME(endLocationTextView, this);
     super.onPause();
   }
-
+  /**
+   -   * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
+   -   * installed) and the map has not already been instantiated.. This will ensure that we only ever
+   -   * call setUpMap()} once when {@link #mMap} is not null.
+   -   * <p/>
+   -   * If it isn't installed {@link SupportMapFragment} (and
+   -   * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
+   -   * install/update the Google Play services APK on their device.
+   -   * <p/>
+   -   * A user can return to this FragmentActivity after following the prompt and correctly
+   -   * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
+   -   * have been completely destroyed during this process (it is likely that it would only be
+   -   * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
+   -   * method in {@link #onResume()} to guarantee that it will be called.
+   -   */
+    private void setUpMapIfNeeded() {
+      // Do a null check to confirm that we have not already instantiated the map.
+      if (mMap == null) {
+        // Try to obtain the map from the SupportMapFragment.
+        MapFragment mapFrag =
+                (MapFragment) getFragmentManager().findFragmentById(R.id.map);
+        mapFrag.getMapAsync(this);
+      }
+    }
   private void loadCurrentPlace(final ResultCallback<PlaceLikelihoodBuffer> callback) {
     PendingResult<PlaceLikelihoodBuffer> currentPlaceResult =
         Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);

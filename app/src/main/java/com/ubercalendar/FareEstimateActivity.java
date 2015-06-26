@@ -48,7 +48,7 @@ public class FareEstimateActivity extends ActionBarActivity {
         intent.getDoubleExtra(Constants.END_LAT, 0),
         intent.getDoubleExtra(Constants.END_LON, 0),
         new UberCallback<PriceEstimateList>() {
-          @Override
+          @Override //TODO handle error case
           public void success(PriceEstimateList priceEstimateList, Response response) {
             estimatesAdatper.addAll(priceEstimateList.getPrices());
           }
