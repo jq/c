@@ -57,3 +57,4 @@ project.properties
 gen-external-apklibs
 .idea
 .gradle
+app/src/debug
