@@ -18,4 +18,11 @@
     <string name="fare_estimate_title">FARE ESTIMATE</string>
     <string name="uber_x">UBERX</string>
     <string name="current_location">Current location</string>
+    <string name="pickup">PICKUP</string>
+    <string name="uberx">uberX</string>
+    <string name="uber_black">Black</string>
+    <string name="uberxl">uberXL</string>
+    <string name="uber_pool">Pool</string>
+    <string name="taxi">TAXI</string>
+
 </resources>

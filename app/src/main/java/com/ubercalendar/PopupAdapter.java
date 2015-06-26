@@ -22,7 +22,9 @@ import android.widget.TextView;
 import com.google.android.gms.maps.GoogleMap.InfoWindowAdapter;
 import com.google.android.gms.maps.model.Marker;
 
-class PopupAdapter implements InfoWindowAdapter {
+import java.util.Comparator;
+
+class PopupAdapter implements InfoWindowAdapter{
   private View popup=null;
   private LayoutInflater inflater=null;
 

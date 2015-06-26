@@ -2,6 +2,8 @@ package com.ubercalendar;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
@@ -34,6 +36,9 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -42,7 +47,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import java.io.IOException;
 import java.util.List;
 
+import com.ubercalendar.util.FloatValues;
+import com.ubercalendar.util.Ln;
 import com.ubercalendar.util.Util;
+
+import hugo.weaving.DebugLog;
 
 public class MapsActivity extends AbstractMapActivity implements
     OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,
@@ -77,8 +86,10 @@ public class MapsActivity extends AbstractMapActivity implements
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    SharedPreferences pref = getSharedPreferences("pref", Context.MODE_PRIVATE);
+    FloatValues.init(pref);
     if (mGoogleApiClient == null) {
-      rebuildGoogleApiClient();
+        rebuildGoogleApiClient();
     }
     setContentView(R.layout.activity_maps);
 
@@ -176,7 +187,13 @@ public class MapsActivity extends AbstractMapActivity implements
         // Try to obtain the map from the SupportMapFragment.
         MapFragment mapFrag =
                 (MapFragment) getFragmentManager().findFragmentById(R.id.map);
-        mapFrag.getMapAsync(this);
+          mMap = mapFrag.getMap();
+          if(mMap != null) {
+              Ln.e("has map in resume");
+              setupMap(mMap);
+          } else {
+              mapFrag.getMapAsync(this);
+          }
       }
     }
   private void loadCurrentPlace(final ResultCallback<PlaceLikelihoodBuffer> callback) {
@@ -203,68 +220,80 @@ public class MapsActivity extends AbstractMapActivity implements
     });
   }
 
-  @Override
-  public void onMapReady(final GoogleMap map) {
-    //addMarker(map, 40.748963847316034, -73.96807193756104,
-    //        R.string.un, R.string.united_nations);
-    map.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
-    map.setOnInfoWindowClickListener(this);
-
-    map.setMyLocationEnabled(true);
-    map.setOnMyLocationChangeListener(this);
-    mMap = map;
-  }
-
-  @Override
-  public void onInfoWindowClick(Marker marker) {
-    Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
-  }
-
-  @Override
-  public void onMyLocationChange(Location lastKnownLocation) {
-    if (mMap == null) return;
-    if (lastLocation != null) {
-      if (!Util.locationChanged(lastKnownLocation, lastLocation)) {
-        return;
-      }
+    private void setupMap(final GoogleMap map) {
+        if (FloatValues.LAST_LAT.get() != 0) {
+            move(FloatValues.LAST_LAT.get(), FloatValues.LAST_LNG.get());
+        }
+        map.setInfoWindowAdapter(new PopupAdapter(getLayoutInflater()));
+        map.setOnInfoWindowClickListener(this);
+        map.setMyLocationEnabled(true);
+        map.setOnMyLocationChangeListener(this);
     }
-    lastLocation = lastKnownLocation;
-    LatLng latlng=
-        new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
-    move(latlng);
-    Log.d(getClass().getSimpleName(),
-        String.format("%f:%f", lastKnownLocation.getLatitude(),
-            lastKnownLocation.getLongitude()));
-  }
-  protected void move(LatLng latlng) {
-    CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latlng, 15);
-
-    mMap.animateCamera(cu);
-
-  }
-
-  private void addMarker(GoogleMap map, double lat, double lon,
-      int title, int snippet) {
-    map.addMarker(new MarkerOptions().position(new LatLng(lat, lon))
-        .title(getString(title))
-        .snippet(getString(snippet)));
-  }
-  private class GeocoderTask extends AsyncTask<String, Void, List<Address>> {
+    @Override
+    public void onMapReady(final GoogleMap map) {
+        mMap = map;
+        setupMap(map);
+        move(map.getMyLocation());
+    }
 
     @Override
-    protected List<Address> doInBackground(String... locationName) {
-      // Creating an instance of Geocoder class
-      Geocoder geocoder = new Geocoder(getBaseContext());
-      List<Address> addresses = null;
-
-      try {
-        // Getting a maximum of 3 Address that matches the input text
-        addresses = geocoder.getFromLocationName(locationName[0], 3);
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-      return addresses;
+    public void onInfoWindowClick(Marker marker) {
+        Toast.makeText(this, marker.getTitle(), Toast.LENGTH_LONG).show();
     }
+
+    @Override
+    public void onMyLocationChange(Location lastKnownLocation) {
+        if (mMap == null) return;
+        move(lastKnownLocation);
+/*        LatLngBounds curScreen = mMap.getProjection()
+                .getVisibleRegion().latLngBounds;
+        mAdapter.setBounds(curScreen); R.drawable.ub__pin_pickup*/
+    }
+    protected void move(double lat, double lng) {
+        LatLng latlng=
+                new LatLng(lat, lng);
+        move(latlng);
+    }
+    protected void move(LatLng latLng) {
+        CameraUpdate cu=CameraUpdateFactory.newLatLngZoom(latLng, 15);
+        mMap.moveCamera(cu);
+        //mMap.animateCamera(cu);
+    }
+    protected void move(Location location) {
+        if (location == null) return;
+        if (FloatValues.updateLocation(location)) {
+            LatLng latlng =
+                    new LatLng(location.getLatitude(), location.getLongitude());
+            move(latlng);
+        }
+    }
+    public void onUpdateMapAfterUserInteraction() {
+        LatLng latLng = mMap.getProjection()
+                .getVisibleRegion().latLngBounds.getCenter();
+        Log.d(getClass().getSimpleName(),
+                String.format("%f:%f", latLng.latitude, latLng.longitude));
+    }
+    private void addMarker(GoogleMap map, double lat, double lon, int iconRes) {
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(iconRes);
+        map.addMarker(new MarkerOptions().position(new LatLng(lat, lon))
+                .draggable(true).icon(icon).flat(true));
+    }
+    private class GeocoderTask extends AsyncTask<String, Void, List<Address>> {
+
+        @Override
+        protected List<Address> doInBackground(String... locationName) {
+            // Creating an instance of Geocoder class
+            Geocoder geocoder = new Geocoder(getBaseContext());
+            List<Address> addresses = null;
+
+            try {
+                // Getting a maximum of 3 Address that matches the input text
+                addresses = geocoder.getFromLocationName(locationName[0], 3);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return addresses;
+        }
 
 
     @Override

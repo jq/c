@@ -17,6 +17,7 @@ package com.ubercalendar;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.DialogFragment;
+import android.app.Fragment;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.pm.FeatureInfo;
@@ -31,8 +32,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.ubercalendar.util.BaseMapFragment;
+import com.ubercalendar.util.TouchableWrapper;
 
-public class AbstractMapActivity extends FragmentActivity {
+public abstract class AbstractMapActivity extends FragmentActivity implements TouchableWrapper.UpdateMapAfterUserInteraction{
   protected static final String TAG_ERROR_DIALOG_FRAGMENT="errorDialog";
 
   @Override
