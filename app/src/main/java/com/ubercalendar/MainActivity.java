@@ -21,6 +21,7 @@ public class MainActivity extends ActionBarActivity {
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
+
     getWindow().requestFeature(Window.FEATURE_PROGRESS);
 
     super.onCreate(savedInstanceState);
