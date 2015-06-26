@@ -13,7 +13,6 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
@@ -25,13 +24,12 @@ import com.google.android.gms.common.api.PendingResult;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.PlaceBuffer;
+import com.google.android.gms.location.places.PlaceLikelihoodBuffer;
 import com.google.android.gms.location.places.Places;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
-import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
@@ -53,9 +51,15 @@ public class MapsActivity extends AbstractMapActivity implements
   private GoogleMap mMap; // Might be null if Google Play services APK is not available.
   protected GoogleApiClient mGoogleApiClient;
 
-  private PlaceAutocompleteAdapter mAdapter;
+  private PlaceAutocompleteAdapter startLocationAdatper;
+  private PlaceAutocompleteAdapter endLocationAdatper;
+  private AutoCompleteTextView startLocationTextView;
+  private AutoCompleteTextView endLocationTextView;
+  private PlaceLikelihoodBuffer currentLikelyPlaceBuffer;
+  private LatLng startLatLng = null;
+  private Button clearStartLocationButton;
+
   private Location lastLocation;
-  private AutoCompleteTextView mAutocompleteView;
 
   public static void start(Context context, String accessToken, String tokenType) {
     Intent intent = new Intent(context, MapsActivity.class);
@@ -71,62 +75,80 @@ public class MapsActivity extends AbstractMapActivity implements
       rebuildGoogleApiClient();
     }
     setContentView(R.layout.activity_maps);
-    // Retrieve the AutoCompleteTextView that will display Place suggestions.
-    mAutocompleteView = (AutoCompleteTextView)
-        findViewById(R.id.autocomplete_places);
 
-    // Register a listener that receives callbacks when a suggestion has been selected
-    mAutocompleteView.setOnItemClickListener(mAutocompleteClickListener);
-
-    // Set up the adapter that will retrieve suggestions from the Places Geo Data API that cover
-    // the entire world.
-    mAdapter = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
+    startLocationTextView = (AutoCompleteTextView) findViewById(R.id.start_location);
+    startLocationAdatper = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
         BOUNDS_GREATER_SYDNEY, null);
-    mAutocompleteView.setAdapter(mAdapter);
+    startLocationTextView.setAdapter(startLocationAdatper);
+    startLocationTextView.setOnItemClickListener(startLocationSelectedListener);
 
-    Button clearAddress = (Button) findViewById(R.id.clear_address);
-    clearAddress.setOnClickListener(new View.OnClickListener() {
+    clearStartLocationButton = (Button) findViewById(R.id.clear_start_location);
+    clearStartLocationButton.setOnClickListener(new View.OnClickListener() {
       @Override
       public void onClick(View view) {
-        mAutocompleteView.setText("");
-        mAutocompleteView.requestFocus();
-        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-        imm.showSoftInput(mAutocompleteView, InputMethodManager.SHOW_IMPLICIT);
+        startLocationTextView.setHint(R.string.current_location);
+        startLatLng = null;
       }
     });
-    setUpMapIfNeeded();
+
+    endLocationTextView = (AutoCompleteTextView) findViewById(R.id.end_location);
+    endLocationAdatper = new PlaceAutocompleteAdapter(this, android.R.layout.simple_list_item_1,
+        BOUNDS_GREATER_SYDNEY, null);
+    endLocationTextView.setAdapter(endLocationAdatper);
+    // Register a listener that receives callbacks when a suggestion has been selected
+    endLocationTextView.setOnItemClickListener(endLocationSelectedListener);
+
+    Button clearEndLocation = (Button) findViewById(R.id.clear_end_location);
+    clearEndLocation.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        endLocationTextView.setText("");
+      }
+    });
+    loadCurrentPlace(null);
   }
 
   @Override
   protected void onResume() {
     super.onResume();
-    setUpMapIfNeeded();
-    mAutocompleteView.selectAll();
+
+    startLatLng = null;
+    clearStartLocationButton.setVisibility(View.GONE);
+    loadCurrentPlace(null);
+    startLocationTextView.setHint(R.string.current_location);
+
+    endLocationTextView.selectAll();
+    setIME(endLocationTextView, MapsActivity.this);
   }
 
-  /**
-   * Sets up the map if it is possible to do so (i.e., the Google Play services APK is correctly
-   * installed) and the map has not already been instantiated.. This will ensure that we only ever
-   * call setUpMap()} once when {@link #mMap} is not null.
-   * <p/>
-   * If it isn't installed {@link SupportMapFragment} (and
-   * {@link com.google.android.gms.maps.MapView MapView}) will show a prompt for the user to
-   * install/update the Google Play services APK on their device.
-   * <p/>
-   * A user can return to this FragmentActivity after following the prompt and correctly
-   * installing/updating/enabling the Google Play services. Since the FragmentActivity may not
-   * have been completely destroyed during this process (it is likely that it would only be
-   * stopped or paused), {@link #onCreate(Bundle)} may not be called again so we should call this
-   * method in {@link #onResume()} to guarantee that it will be called.
-   */
-  private void setUpMapIfNeeded() {
-    // Do a null check to confirm that we have not already instantiated the map.
-    if (mMap == null) {
-      // Try to obtain the map from the SupportMapFragment.
-      MapFragment mapFrag=
-          (MapFragment)getFragmentManager().findFragmentById(R.id.map);
-      mapFrag.getMapAsync(this);
-    }
+  @Override
+  protected void onPause() {
+    hideIME(startLocationTextView, this);
+    hideIME(endLocationTextView, this);
+  }
+
+  private void loadCurrentPlace(final ResultCallback<PlaceLikelihoodBuffer> callback) {
+    PendingResult<PlaceLikelihoodBuffer> currentPlaceResult =
+        Places.PlaceDetectionApi.getCurrentPlace(mGoogleApiClient, null);
+    currentPlaceResult.setResultCallback(new ResultCallback<PlaceLikelihoodBuffer>() {
+      @Override
+      public void onResult(PlaceLikelihoodBuffer placeLikelihoods) {
+        if (placeLikelihoods.getCount() == 0) {
+          Log.e(TAG, "Cannot find current place");
+          return;
+        }
+        final Place currentPlace = placeLikelihoods.get(0).getPlace();
+        final LatLng currentLatLng = currentPlace.getLatLng();
+        for (int i = 0; i < placeLikelihoods.getCount(); ++i) {
+          Log.i(TAG,
+              "Likely place " + i + " is " + placeLikelihoods.get(i).getPlace().getAddress());
+        }
+        currentLikelyPlaceBuffer = placeLikelihoods;
+        if (callback != null) {
+          callback.onResult(currentLikelyPlaceBuffer);
+        }
+      }
+    });
   }
 
   @Override
@@ -158,9 +180,6 @@ public class MapsActivity extends AbstractMapActivity implements
     LatLng latlng=
         new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
     move(latlng);
-/*        LatLngBounds curScreen = mMap.getProjection()
-                .getVisibleRegion().latLngBounds;
-        mAdapter.setBounds(curScreen);*/
     Log.d(getClass().getSimpleName(),
         String.format("%f:%f", lastKnownLocation.getLatitude(),
             lastKnownLocation.getLongitude()));
@@ -230,7 +249,46 @@ public class MapsActivity extends AbstractMapActivity implements
       }
     }
   }
-  private AdapterView.OnItemClickListener mAutocompleteClickListener
+
+  private AdapterView.OnItemClickListener startLocationSelectedListener
+      = new AdapterView.OnItemClickListener() {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+      clearStartLocationButton.setVisibility(View.VISIBLE);
+            /*
+             Retrieve the place ID of the selected item from the Adapter.
+             The adapter stores each Place suggestion in a PlaceAutocomplete object from which we
+             read the place ID.
+              */
+      final PlaceAutocompleteAdapter.PlaceAutocomplete item =
+          startLocationAdatper.getItem(position);
+      final String placeId = String.valueOf(item.placeId);
+      Log.i(TAG, "Start Autocomplete item selected: " + item.description);
+
+            /*
+             Issue a request to the Places Geo Data API to retrieve a Place object with additional
+              details about the place.
+              */
+      PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
+          .getPlaceById(mGoogleApiClient, placeId);
+      placeResult.setResultCallback(new ResultCallback<PlaceBuffer>() {
+        @Override
+        public void onResult(PlaceBuffer places) {
+          if (!places.getStatus().isSuccess()) {
+            // Request did not complete successfully
+            Log.e(TAG, "Place query did not complete. Error: " + places.getStatus().toString());
+
+            return;
+          }
+          // Get the Place object from the buffer.
+          final Place place = places.get(0);
+          startLatLng = place.getLatLng();
+        }
+      });
+    }
+  };
+
+  private AdapterView.OnItemClickListener endLocationSelectedListener
       = new AdapterView.OnItemClickListener() {
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
@@ -239,7 +297,7 @@ public class MapsActivity extends AbstractMapActivity implements
              The adapter stores each Place suggestion in a PlaceAutocomplete object from which we
              read the place ID.
               */
-      final PlaceAutocompleteAdapter.PlaceAutocomplete item = mAdapter.getItem(position);
+      final PlaceAutocompleteAdapter.PlaceAutocomplete item = endLocationAdatper.getItem(position);
       final String placeId = String.valueOf(item.placeId);
       Log.i(TAG, "Autocomplete item selected: " + item.description);
 
@@ -250,9 +308,8 @@ public class MapsActivity extends AbstractMapActivity implements
       PendingResult<PlaceBuffer> placeResult = Places.GeoDataApi
           .getPlaceById(mGoogleApiClient, placeId);
       placeResult.setResultCallback(mUpdatePlaceDetailsCallback);
-      mAutocompleteView.clearListSelection();
-//      mAutocompleteView.setText("");
-      hideIME(mAutocompleteView, MapsActivity.this);
+      endLocationTextView.clearListSelection();
+      hideIME(endLocationTextView, MapsActivity.this);
       Log.i(TAG, "Called getPlaceById to get Place details for " + item.placeId);
     }
   };
@@ -274,23 +331,40 @@ public class MapsActivity extends AbstractMapActivity implements
       // Get the Place object from the buffer.
       final Place place = places.get(0);
       final LatLng latLng = place.getLatLng();
-      Log.i(TAG, String.format(
-          "startLatitude: %s, startLongitude: %s, endLatitude: %s, endLongitude %s",
-          lastLocation.getLatitude(),
-          lastLocation.getLongitude(),
-          latLng.latitude,
-          latLng.longitude));
-      FareEstimateActivity.start(MapsActivity.this,
-          getIntent().getStringExtra(Constants.ACCESS_TOKEN),
-          getIntent().getStringExtra(Constants.TOKEN_TYPE),
-          lastLocation.getLatitude(),
-          lastLocation.getLongitude(),
-          latLng.latitude,
-          latLng.longitude);
-//            move(place.getLatLng());
-//            Log.i(TAG, "Place details received: " + place.getName());
+      if (startLatLng != null) {
+        estimateFare(startLatLng, latLng);
+      } else {
+        estimateFareFromCurrentPlace(latLng);
+      }
     }
   };
+
+  private void estimateFareFromCurrentPlace(final LatLng destination) {
+    if (currentLikelyPlaceBuffer != null && currentLikelyPlaceBuffer.getCount() > 0) {
+      Place currentPlace = currentLikelyPlaceBuffer.get(0).getPlace();
+      estimateFare(currentPlace.getLatLng(), destination);
+    } else {
+      loadCurrentPlace(new ResultCallback<PlaceLikelihoodBuffer>() {
+        @Override
+        public void onResult(PlaceLikelihoodBuffer placeLikelihoods) {
+          if (currentLikelyPlaceBuffer != null && currentLikelyPlaceBuffer.getCount() > 0) {
+            Place currentPlace = currentLikelyPlaceBuffer.get(0).getPlace();
+            estimateFare(currentPlace.getLatLng(), destination);
+          }
+        }
+      });
+    }
+  }
+
+  private void estimateFare(LatLng start, LatLng end) {
+    FareEstimateActivity.start(MapsActivity.this,
+        getIntent().getStringExtra(Constants.ACCESS_TOKEN),
+        getIntent().getStringExtra(Constants.TOKEN_TYPE),
+        start.latitude,
+        start.longitude,
+        end.latitude,
+        end.longitude);
+  }
 
   private static Spanned formatPlaceDetails(Resources res, CharSequence name, String id,
       CharSequence address, CharSequence phoneNumber, Uri websiteUri) {
@@ -313,6 +387,7 @@ public class MapsActivity extends AbstractMapActivity implements
         .enableAutoManage(this, 0 /* clientId */, this)
         .addConnectionCallbacks(this)
         .addApi(Places.GEO_DATA_API)
+        .addApi(Places.PLACE_DETECTION_API)
         .build();
   }
 
@@ -335,7 +410,8 @@ public class MapsActivity extends AbstractMapActivity implements
         Toast.LENGTH_SHORT).show();
 
     // Disable API access in the adapter because the client was not initialised correctly.
-    mAdapter.setGoogleApiClient(null);
+    startLocationAdatper.setGoogleApiClient(null);
+    endLocationAdatper.setGoogleApiClient(null);
 
   }
 
@@ -343,7 +419,8 @@ public class MapsActivity extends AbstractMapActivity implements
   @Override
   public void onConnected(Bundle bundle) {
     // Successfully connected to the API client. Pass it to the adapter to enable API access.
-    mAdapter.setGoogleApiClient(mGoogleApiClient);
+    startLocationAdatper.setGoogleApiClient(mGoogleApiClient);
+    endLocationAdatper.setGoogleApiClient(mGoogleApiClient);
     Log.i(TAG, "GoogleApiClient connected.");
 
   }
@@ -351,7 +428,8 @@ public class MapsActivity extends AbstractMapActivity implements
   @Override
   public void onConnectionSuspended(int i) {
     // Connection to the API client has been suspended. Disable API access in the client.
-    mAdapter.setGoogleApiClient(null);
+    startLocationAdatper.setGoogleApiClient(null);
+    endLocationAdatper.setGoogleApiClient(null);
     Log.e(TAG, "GoogleApiClient connection suspended.");
   }
 
