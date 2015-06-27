@@ -48,6 +48,7 @@ public class MainActivity extends ActionBarActivity {
     uriBuilder.appendQueryParameter("scope", Constants.SCOPES);
     uriBuilder.appendQueryParameter("redirect_uri", Constants.getUberRedirectUrl(this));
     return uriBuilder.build().toString().replace("%20", "+");
+
   }
 
   private class UberWebViewClient extends WebViewClient {
@@ -66,6 +67,7 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private boolean checkRedirect(String url) {
+
       if (url.startsWith(Constants.getUberRedirectUrl(MainActivity.this))) {
         Uri uri = Uri.parse(url);
         UberAuthTokenClient.getUberAuthTokenClient().getAuthToken(

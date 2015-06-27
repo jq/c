@@ -3,7 +3,8 @@ package com.ubercalendar.util;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
-import android.location.Location;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,4 +28,17 @@ public class Util {
         }
         return emailAddresses;
     }
+    // ConnectivityManager.TYPE_WIFI;ConnectivityManager.TYPE_MOBILE
+    public static int checkNetworkConnection(Context context) {
+        ConnectivityManager connMgr =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo activeInfo = connMgr.getActiveNetworkInfo();
+
+        if (activeInfo != null && activeInfo.isConnected()) {
+            return activeInfo.getType();
+        } else {
+            return -1;// ConnectivityManager.TYPE_NONE;
+        }
+    }
+
 }
