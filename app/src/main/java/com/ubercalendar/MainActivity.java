@@ -2,8 +2,8 @@ package com.ubercalendar;
 
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
+import android.view.View;
 import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -14,11 +14,16 @@ import com.ubercalendar.api.UberAuthTokenClient;
 import com.ubercalendar.api.UberCallback;
 import com.ubercalendar.model.User;
 
+import butterknife.Bind;
+import butterknife.ButterKnife;
+import fr.castorflex.android.smoothprogressbar.SmoothProgressBar;
+import hugo.weaving.DebugLog;
 import retrofit.client.Response;
 
 
 public class MainActivity extends ActionBarActivity {
-
+  @Bind(R.id.progressbar)
+  SmoothProgressBar progressBar;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -27,7 +32,7 @@ public class MainActivity extends ActionBarActivity {
 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-
+    ButterKnife.bind(this);
     WebView webView = (WebView) findViewById(R.id.web_view);
     webView.getSettings().setJavaScriptEnabled(true);
 
@@ -40,8 +45,18 @@ public class MainActivity extends ActionBarActivity {
     webView.setWebViewClient(new UberWebViewClient());
 
     webView.loadUrl(buildUrl());
-    Snackbar.make(webView, "xxx", Snackbar.LENGTH_LONG).show();
+//    progressBar.setIndeterminateDrawable(new SmoothProgressDrawable.Builder(this).
+//            interpolator(new AccelerateInterpolator()).build());
+    showProgressBar();
+    //Snackbar.make(webView, "xxx", Snackbar.LENGTH_LONG).show();
 
+  }
+  @DebugLog public void showProgressBar() {
+    progressBar.setVisibility(View.VISIBLE);
+  }
+
+  @DebugLog public void hideProgressBar() {
+    progressBar.setVisibility(View.GONE);
   }
 
   private String buildUrl() {
@@ -69,6 +84,7 @@ public class MainActivity extends ActionBarActivity {
       Toast.makeText(MainActivity.this, "Oh no! " + description, Toast.LENGTH_SHORT).show();
     }
 
+    @DebugLog
     private boolean checkRedirect(String url) {
 
       if (url.startsWith(Constants.getUberRedirectUrl(MainActivity.this))) {
@@ -82,6 +98,7 @@ public class MainActivity extends ActionBarActivity {
             new UberCallback<User>() {
               @Override
               public void success(User user, Response response) {
+                hideProgressBar();
                 MapsActivity.start(MainActivity.this, user.getAccessToken(),
                     user.getTokenType());
                 finish();

@@ -31,7 +31,9 @@ import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 /**
  * Created by amoi on 6/27/15.
@@ -60,6 +62,7 @@ public class FareEstimateActivityTest {
   @Before
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
+    // hack 因为传不进去
     UberAPIClient.testAPIService = apiInterface;
     priceEsitmateCallback = (ArgumentCaptor<Callback<PriceEstimateList>>)
         ((Object)ArgumentCaptor.forClass(Callback.class));
@@ -72,9 +75,13 @@ public class FareEstimateActivityTest {
 
   @Test
   public void simple() {
+    when(apiInterface.toString()).thenReturn("abc");
+
     FareEstimateActivity activity = controller.create(new Bundle()).get();
+    verify(apiInterface, never()).toString();
+    //any 是不在乎,如果有一个参数是any 需要eq
     verify(apiInterface).getPriceEstimates(any(String.class), eq(START_LAT),
-        eq(START_LON), eq(END_LAT), eq(END_LON), priceEsitmateCallback.capture());
+        eq(START_LON), eq(END_LAT), eq(END_LON), priceEsitmateCallback.capture());//拿到内部的对象
     priceEsitmateCallback.getValue().success(new TestEstimates(), RESPONSE);
     assertThat(activity.estimatesAdapter.getCount(), is(3));
   }
