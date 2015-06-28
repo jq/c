@@ -1,6 +1,7 @@
 package com.ubercalendar;
 
 import android.content.Context;
+import android.os.Build;
 import android.os.Bundle;
 
 import com.google.common.collect.ImmutableList;
@@ -37,7 +38,7 @@ import static org.mockito.Mockito.verify;
  */
 
 @RunWith(RobolectricTestRunner.class)
-@Config(constants = BuildConfig.class)//, manifest = "src/test/java/com/ubercalendar/AndroidManifest.xml", sdk = 18)
+@Config(manifest = "src/main/TestManifest.xml", sdk = Build.VERSION_CODES.LOLLIPOP)
 public class FareEstimateActivityTest {
 
   private static final String TOKEN = "token";
@@ -60,10 +61,12 @@ public class FareEstimateActivityTest {
   public void setUp() throws Exception {
     MockitoAnnotations.initMocks(this);
     UberAPIClient.testAPIService = apiInterface;
+    priceEsitmateCallback = (ArgumentCaptor<Callback<PriceEstimateList>>)
+        ((Object)ArgumentCaptor.forClass(Callback.class));
 
     Context context = RuntimeEnvironment.application.getApplicationContext();
     controller = Robolectric.buildActivity(FareEstimateActivity.class)
-        .newIntent(FareEstimateActivity.newIntent(context, TOKEN, TYPE, START_LAT, START_LON,
+        .withIntent(FareEstimateActivity.newIntent(context, TOKEN, TYPE, START_LAT, START_LON,
             END_LAT, END_LON));
   }
 
@@ -71,8 +74,8 @@ public class FareEstimateActivityTest {
   public void simple() {
     FareEstimateActivity activity = controller.create(new Bundle()).get();
     verify(apiInterface).getPriceEstimates(any(String.class), eq(START_LAT),
-        eq(START_LON), eq(END_LAT), eq(END_LON), priceEsitmateCallback.getValue());
-    priceEsitmateCallback.capture().success(new TestEstimates(), RESPONSE);
+        eq(START_LON), eq(END_LAT), eq(END_LON), priceEsitmateCallback.capture());
+    priceEsitmateCallback.getValue().success(new TestEstimates(), RESPONSE);
     assertThat(activity.estimatesAdapter.getCount(), is(3));
   }
 
