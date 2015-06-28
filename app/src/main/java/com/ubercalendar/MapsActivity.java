@@ -3,7 +3,6 @@ package com.ubercalendar;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-
 import android.content.res.Resources;
 import android.location.Address;
 import android.location.Geocoder;
@@ -43,15 +42,11 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.ubercalendar.util.FloatValues;
+import com.ubercalendar.util.Ln;
 
 import java.io.IOException;
 import java.util.List;
-
-import com.ubercalendar.util.FloatValues;
-import com.ubercalendar.util.Ln;
-import com.ubercalendar.util.Util;
-
-import hugo.weaving.DebugLog;
 
 public class MapsActivity extends AbstractMapActivity implements
     OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener,

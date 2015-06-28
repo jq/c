@@ -2,6 +2,7 @@ package com.ubercalendar;
 
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Window;
 import android.webkit.WebChromeClient;
@@ -39,6 +40,8 @@ public class MainActivity extends ActionBarActivity {
     webView.setWebViewClient(new UberWebViewClient());
 
     webView.loadUrl(buildUrl());
+    Snackbar.make(webView, "xxx", Snackbar.LENGTH_LONG).show();
+
   }
 
   private String buildUrl() {
