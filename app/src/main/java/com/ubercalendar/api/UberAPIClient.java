@@ -17,6 +17,7 @@ import retrofit.http.Query;
 
 public class UberAPIClient {
 
+    public static UberAPIInterface testAPIService = null;
     private static UberAPIInterface sUberAPIService;
     private static UberEndPoint sEndPoint = new UberEndPoint(Constants.BASE_UBER_URL_V1, Constants.BASE_UBER_URL_V1_1);
 
@@ -34,6 +35,9 @@ public class UberAPIClient {
     }
 
     public static UberAPIInterface getUberV1APIClient() {
+      if (testAPIService != null) {
+        return testAPIService;
+      }
         sEndPoint.setVersion(false);
         return getUberAPIClient();
     }

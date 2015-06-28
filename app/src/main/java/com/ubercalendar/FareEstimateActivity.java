@@ -3,6 +3,7 @@ package com.ubercalendar;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.ListView;
 
@@ -15,9 +16,15 @@ import retrofit.client.Response;
 /**
  * Created by amoi on 6/23/15.
  */
-public class FareEstimateActivity extends ActionBarActivity {
+public class FareEstimateActivity extends FragmentActivity {
 
   public static void start(Context context, String accessToken, String tokenType,
+      double startLatitude, double startLongitude, double endLatitude, double endLongitude) {
+    context.startActivity(newIntent(context, accessToken, tokenType, startLatitude,
+        startLongitude, endLatitude, endLongitude));
+  }
+
+  public static Intent newIntent(Context context, String accessToken, String tokenType,
       double startLatitude, double startLongitude, double endLatitude, double endLongitude) {
     Intent intent = new Intent(context, FareEstimateActivity.class);
     intent.putExtra(Constants.ACCESS_TOKEN, accessToken);
@@ -26,10 +33,10 @@ public class FareEstimateActivity extends ActionBarActivity {
     intent.putExtra(Constants.START_LON, startLongitude);
     intent.putExtra(Constants.END_LAT, endLatitude);
     intent.putExtra(Constants.END_LON, endLongitude);
-    context.startActivity(intent);
+    return intent;
   }
 
-  private FareEstimatesAdapter estimatesAdatper;
+  FareEstimatesAdapter estimatesAdapter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -37,8 +44,8 @@ public class FareEstimateActivity extends ActionBarActivity {
     setContentView(R.layout.fare_estimate);
 
     ListView estimatesView = (ListView) findViewById(R.id.fare_estimates);
-    estimatesAdatper = new FareEstimatesAdapter(this);
-    estimatesView.setAdapter(estimatesAdatper);
+    estimatesAdapter = new FareEstimatesAdapter(this);
+    estimatesView.setAdapter(estimatesAdapter);
 
     final Intent intent = getIntent();
     UberAPIClient.getUberV1APIClient().getPriceEstimates(
@@ -50,11 +57,12 @@ public class FareEstimateActivity extends ActionBarActivity {
         new UberCallback<PriceEstimateList>() {
           @Override //TODO handle error case
           public void success(PriceEstimateList priceEstimateList, Response response) {
-            estimatesAdatper.addAll(priceEstimateList.getPrices());
+            estimatesAdapter.addAll(priceEstimateList.getPrices());
           }
         });
   }
-  private String getAccessToken(Intent intent) {
+
+  static String getAccessToken(Intent intent) {
     return intent.getStringExtra(Constants.TOKEN_TYPE) + " "
         + intent.getStringExtra(Constants.ACCESS_TOKEN);
   }
