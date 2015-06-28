@@ -29,7 +29,7 @@ public class FareEstimateActivity extends ActionBarActivity {
     context.startActivity(intent);
   }
 
-  private FareEstimatesAdatper estimatesAdatper;
+  private FareEstimatesAdapter estimatesAdatper;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -37,7 +37,7 @@ public class FareEstimateActivity extends ActionBarActivity {
     setContentView(R.layout.fare_estimate);
 
     ListView estimatesView = (ListView) findViewById(R.id.fare_estimates);
-    estimatesAdatper = new FareEstimatesAdatper(this);
+    estimatesAdatper = new FareEstimatesAdapter(this);
     estimatesView.setAdapter(estimatesAdatper);
 
     final Intent intent = getIntent();

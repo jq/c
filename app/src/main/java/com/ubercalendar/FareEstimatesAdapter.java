@@ -13,9 +13,9 @@ import com.ubercalendar.model.PriceEstimate;
 /**
  * Created by amoi on 6/23/15.
  */
-public class FareEstimatesAdatper extends ArrayAdapter<PriceEstimate> {
+public class FareEstimatesAdapter extends ArrayAdapter<PriceEstimate> {
 
-  public FareEstimatesAdatper(Context context) {
+  public FareEstimatesAdapter(Context context) {
     super(context, R.layout.fare_estimate_item);
   }
 
