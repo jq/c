@@ -2,9 +2,9 @@
 package com.ubercalendar.util;
 
 import android.app.Activity;
-import android.app.Fragment;
-import android.app.LoaderManager.LoaderCallbacks;
-import android.content.Loader;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.LoaderManager.LoaderCallbacks;
+import android.support.v4.content.Loader;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -75,7 +75,6 @@ public abstract class ItemListFragment<E> extends Fragment
 
         if (!items.isEmpty())
             setListShown(true, false);
-
         getLoaderManager().initLoader(0, null, this);
     }
 

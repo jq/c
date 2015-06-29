@@ -10,6 +10,8 @@ import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.text.Html;
 import android.text.Spanned;
 import android.util.Log;
@@ -64,7 +66,6 @@ public class MapsActivity extends AbstractMapActivity implements
   private PlaceAutocompleteAdapter endLocationAdatper;
   private AutoCompleteTextView startLocationTextView;
   private AutoCompleteTextView endLocationTextView;
-  private PlaceLikelihoodBuffer currentLikelyPlaceBuffer;
   private LatLng startLatLng = null;
   private LatLng endLatLng = null;
   private Button clearStartLocationButton;
@@ -136,7 +137,7 @@ public class MapsActivity extends AbstractMapActivity implements
 
     });
     setUpMapIfNeeded();
-    loadCurrentPlace(null);
+    //loadCurrentPlace(null);
   }
 
   @Override
@@ -145,7 +146,7 @@ public class MapsActivity extends AbstractMapActivity implements
     setUpMapIfNeeded();
     startLatLng = null;
     clearStartLocationButton.setVisibility(View.GONE);
-    loadCurrentPlace(null);
+    //loadCurrentPlace(null);
     startLocationTextView.setText("");
     startLocationTextView.setHint(R.string.current_location);
 
@@ -181,6 +182,7 @@ public class MapsActivity extends AbstractMapActivity implements
         MapFragment mapFrag =
                 (MapFragment) getFragmentManager().findFragmentById(R.id.map);
           mMap = mapFrag.getMap();
+          // save
           if(mMap != null) {
               Ln.e("has map in resume");
               setupMap(mMap);
@@ -196,19 +198,18 @@ public class MapsActivity extends AbstractMapActivity implements
       @Override
       public void onResult(PlaceLikelihoodBuffer placeLikelihoods) {
         if (placeLikelihoods.getCount() == 0) {
+            placeLikelihoods.release();
           Log.e(TAG, "Cannot find current place");
           return;
         }
-        final Place currentPlace = placeLikelihoods.get(0).getPlace();
-        final LatLng currentLatLng = currentPlace.getLatLng();
         for (int i = 0; i < placeLikelihoods.getCount(); ++i) {
           Log.i(TAG,
               "Likely place " + i + " is " + placeLikelihoods.get(i).getPlace().getAddress());
         }
-        currentLikelyPlaceBuffer = placeLikelihoods;
         if (callback != null) {
-          callback.onResult(currentLikelyPlaceBuffer);
+          callback.onResult(placeLikelihoods);
         }
+          placeLikelihoods.release();
       }
     });
   }
@@ -352,11 +353,12 @@ public class MapsActivity extends AbstractMapActivity implements
             // Request did not complete successfully
             Log.e(TAG, "Place query did not complete. Error: " + places.getStatus().toString());
 
-            return;
+          } else {
+              // Get the Place object from the buffer.
+              final Place place = places.get(0);
+              startLatLng = place.getLatLng();
           }
-          // Get the Place object from the buffer.
-          final Place place = places.get(0);
-          startLatLng = place.getLatLng();
+            places.release();
         }
       });
     }
@@ -401,52 +403,60 @@ public class MapsActivity extends AbstractMapActivity implements
         Log.e(TAG, "Place query did not complete. Error: " + places.getStatus().toString());
 
         return;
-      }
-      // Get the Place object from the buffer.
-      final Place place = places.get(0);
-      endLatLng = place.getLatLng();
-      if (startLatLng != null) {
-        estimateFare(startLatLng, endLatLng);
       } else {
-        estimateFareFromCurrentPlace(endLatLng);
+          // Get the Place object from the buffer.
+          final Place place = places.get(0);
+          endLatLng = place.getLatLng();
+          if (startLatLng != null) {
+              estimateFare(startLatLng, endLatLng);
+          } else {
+              estimateFareFromCurrentPlace(endLatLng);
+          }
       }
+        places.release();
     }
   };
-
+    //Place currentPlace;
   private void estimateFareFromCurrentPlace(final LatLng destination) {
-    try {
-      if (currentLikelyPlaceBuffer != null && currentLikelyPlaceBuffer.getCount() > 0) {
-        Place currentPlace = currentLikelyPlaceBuffer.get(0).getPlace();
-        estimateFare(currentPlace.getLatLng(), destination);
-      } else {
-        loadCurrentPlace(new ResultCallback<PlaceLikelihoodBuffer>() {
-          @Override
-          public void onResult(PlaceLikelihoodBuffer placeLikelihoods) {
-            if (currentLikelyPlaceBuffer != null && currentLikelyPlaceBuffer.getCount() > 0) {
-              Place currentPlace = currentLikelyPlaceBuffer.get(0).getPlace();
-              estimateFare(currentPlace.getLatLng(), destination);
-            }
-          }
-        });
-      }
-    } finally {
-      if (currentLikelyPlaceBuffer != null) {
-        currentLikelyPlaceBuffer.release();
-        currentLikelyPlaceBuffer = null;
-      }
-    }
+//    if (currentPlace != null) {
+//      estimateFare(currentPlace.getLatLng(), destination);
+//    } else {
+      loadCurrentPlace(new ResultCallback<PlaceLikelihoodBuffer>() {
+        @Override
+        public void onResult(PlaceLikelihoodBuffer placeLikelihoods) {
+          if (placeLikelihoods != null && placeLikelihoods.getCount() > 0) {
+            Place currentPlace = placeLikelihoods.get(0).getPlace();
+            estimateFare(currentPlace.getLatLng(), destination);
+              //placeLikelihoods.release();
+           }
+        }
+      });
   }
 
   private void estimateFare(LatLng start, LatLng end) {
-    FareEstimateActivity.start(MapsActivity.this,
-        getIntent().getStringExtra(Constants.ACCESS_TOKEN),
-        getIntent().getStringExtra(Constants.TOKEN_TYPE),
-        start.latitude,
-        start.longitude,
-        end.latitude,
-        end.longitude);
+      estimateFareFragment(start, end);
+//    FareEstimateActivity.start(MapsActivity.this,
+//        getIntent().getStringExtra(Constants.ACCESS_TOKEN),
+//        getIntent().getStringExtra(Constants.TOKEN_TYPE),
+//        start.latitude,
+//        start.longitude,
+//        end.latitude,
+//        end.longitude);
   }
-
+    private void estimateFareFragment(LatLng start, LatLng end) {
+        FragmentManager manager= this.getSupportFragmentManager();
+        FragmentTransaction ft = manager.beginTransaction();
+        ft.replace(R.id.map, PriceEstimateList.newInstance(
+                getIntent().getStringExtra(Constants.ACCESS_TOKEN),
+        getIntent().getStringExtra(Constants.TOKEN_TYPE),
+                start.latitude,
+                start.longitude,
+                end.latitude,
+                end.longitude
+        ));
+        ft.addToBackStack(null);
+        ft.commit();
+    }
   private static Spanned formatPlaceDetails(Resources res, CharSequence name, String id,
       CharSequence address, CharSequence phoneNumber, Uri websiteUri) {
     // Log.e(TAG, res.getString(R.string.place_details, name, id, address, phoneNumber,

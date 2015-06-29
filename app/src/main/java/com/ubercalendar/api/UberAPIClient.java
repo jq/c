@@ -105,7 +105,13 @@ public class UberAPIClient {
                                @Query("end_latitude") double endLatitude,
                                @Query("end_longitude") double endLongitude,
                                Callback<PriceEstimateList> callback);
-
+        // sync
+        @GET("/estimates/price")
+        PriceEstimateList getPriceEstimates(@Header("Authorization") String authToken,
+                                            @Query("start_latitude") double startLatitude,
+                                            @Query("start_longitude") double startLongitude,
+                                            @Query("end_latitude") double endLatitude,
+                                            @Query("end_longitude") double endLongitude);
         /**
          * The User Activity endpoint returns data about a user's lifetime activity with Uber. The
          * response will include pickup locations and times, dropoff locations and times, the

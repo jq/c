@@ -1,5 +1,7 @@
 package com.ubercalendar;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
@@ -13,6 +15,7 @@ import android.widget.Toast;
 import com.ubercalendar.api.UberAuthTokenClient;
 import com.ubercalendar.api.UberCallback;
 import com.ubercalendar.model.User;
+import com.ubercalendar.util.StringValues;
 
 import butterknife.Bind;
 import butterknife.ButterKnife;
@@ -32,6 +35,8 @@ public class MainActivity extends ActionBarActivity {
 
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+    SharedPreferences pref = getSharedPreferences("pref", Context.MODE_PRIVATE);
+    StringValues.init(pref);
     ButterKnife.bind(this);
     WebView webView = (WebView) findViewById(R.id.web_view);
     webView.getSettings().setJavaScriptEnabled(true);
@@ -99,6 +104,7 @@ public class MainActivity extends ActionBarActivity {
               @Override
               public void success(User user, Response response) {
                 hideProgressBar();
+                StringValues.updateToken(user);
                 MapsActivity.start(MainActivity.this, user.getAccessToken(),
                     user.getTokenType());
                 finish();
