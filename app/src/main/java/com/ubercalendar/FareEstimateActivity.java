@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.ActionBarActivity;
 import android.widget.ListView;
 
@@ -43,10 +44,26 @@ public class FareEstimateActivity extends FragmentActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.fare_estimate);
 
-    ListView estimatesView = (ListView) findViewById(R.id.fare_estimates);
-    estimatesAdapter = new FareEstimatesAdapter(this);
-    estimatesView.setAdapter(estimatesAdapter);
+//    ListView estimatesView = (ListView) findViewById(R.id.fare_estimates);
+//    estimatesAdapter = new FareEstimatesAdapter(this);
+//    estimatesView.setAdapter(estimatesAdapter);
 
+//    load(new UberCallback<PriceEstimateList>() {
+//      @Override //TODO handle error case
+//      public void success(PriceEstimateList priceEstimateList, Response response) {
+//        estimatesAdapter.addAll(priceEstimateList.getPrices());
+//      }
+//    });
+
+    if (savedInstanceState == null) {
+      FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+      FareEstimateFragment fragment = new FareEstimateFragment();
+      transaction.replace(R.id.fare_estimates_fragment, fragment);
+      transaction.commit();
+    }
+  }
+
+  public void load(UberCallback<PriceEstimateList> callback) {
     final Intent intent = getIntent();
     UberAPIClient.getUberV1APIClient().getPriceEstimates(
         getAccessToken(intent),
@@ -54,12 +71,7 @@ public class FareEstimateActivity extends FragmentActivity {
         intent.getDoubleExtra(Constants.START_LON, 0),
         intent.getDoubleExtra(Constants.END_LAT, 0),
         intent.getDoubleExtra(Constants.END_LON, 0),
-        new UberCallback<PriceEstimateList>() {
-          @Override //TODO handle error case
-          public void success(PriceEstimateList priceEstimateList, Response response) {
-            estimatesAdapter.addAll(priceEstimateList.getPrices());
-          }
-        });
+        callback);
   }
 
   static String getAccessToken(Intent intent) {

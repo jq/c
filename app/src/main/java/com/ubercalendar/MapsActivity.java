@@ -74,8 +74,6 @@ public class MapsActivity extends AbstractMapActivity implements
   private LatLng endLatLng = null;
   private Button clearStartLocationButton;
 
-  private Location lastLocation;
-
   public static void start(Context context, String accessToken, String tokenType) {
     Intent intent = new Intent(context, MapsActivity.class);
     intent.putExtra(Constants.ACCESS_TOKEN, accessToken);
@@ -421,19 +419,26 @@ public class MapsActivity extends AbstractMapActivity implements
   };
 
   private void estimateFareFromCurrentPlace(final LatLng destination) {
-    if (currentLikelyPlaceBuffer != null && currentLikelyPlaceBuffer.getCount() > 0) {
-      Place currentPlace = currentLikelyPlaceBuffer.get(0).getPlace();
-      estimateFare(currentPlace.getLatLng(), destination);
-    } else {
-      loadCurrentPlace(new ResultCallback<PlaceLikelihoodBuffer>() {
-        @Override
-        public void onResult(PlaceLikelihoodBuffer placeLikelihoods) {
-          if (currentLikelyPlaceBuffer != null && currentLikelyPlaceBuffer.getCount() > 0) {
-            Place currentPlace = currentLikelyPlaceBuffer.get(0).getPlace();
-            estimateFare(currentPlace.getLatLng(), destination);
+    try {
+      if (currentLikelyPlaceBuffer != null && currentLikelyPlaceBuffer.getCount() > 0) {
+        Place currentPlace = currentLikelyPlaceBuffer.get(0).getPlace();
+        estimateFare(currentPlace.getLatLng(), destination);
+      } else {
+        loadCurrentPlace(new ResultCallback<PlaceLikelihoodBuffer>() {
+          @Override
+          public void onResult(PlaceLikelihoodBuffer placeLikelihoods) {
+            if (currentLikelyPlaceBuffer != null && currentLikelyPlaceBuffer.getCount() > 0) {
+              Place currentPlace = currentLikelyPlaceBuffer.get(0).getPlace();
+              estimateFare(currentPlace.getLatLng(), destination);
+            }
           }
-        }
-      });
+        });
+      }
+    } finally {
+      if (currentLikelyPlaceBuffer != null) {
+        currentLikelyPlaceBuffer.release();
+        currentLikelyPlaceBuffer = null;
+      }
     }
   }
 

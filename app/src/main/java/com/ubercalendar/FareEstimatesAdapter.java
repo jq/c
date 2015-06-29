@@ -15,6 +15,8 @@ import com.ubercalendar.model.PriceEstimate;
  */
 public class FareEstimatesAdapter extends ArrayAdapter<PriceEstimate> {
 
+  private int counter;
+
   public FareEstimatesAdapter(Context context) {
     super(context, R.layout.fare_estimate_item);
   }
@@ -29,10 +31,17 @@ public class FareEstimatesAdapter extends ArrayAdapter<PriceEstimate> {
       layout = (RelativeLayout) convertView;
     }
     PriceEstimate priceEstimate = getItem(position);
+    TextView counterView = (TextView) layout.findViewById(R.id.counter);
+    counterView.setText(Integer.toString(position + counter));
     TextView type = (TextView) layout.findViewById(R.id.type);
     type.setText(priceEstimate.getDisplayName());
     TextView estimate = (TextView) layout.findViewById(R.id.estimate);
     estimate.setText(priceEstimate.getEstimate());
     return layout;
+  }
+
+  public void setCounter(int counter) {
+    this.counter = counter;
+    notifyDataSetChanged();
   }
 }
